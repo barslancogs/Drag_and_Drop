@@ -2251,9 +2251,9 @@ savefig(fileName, 300, 12, 8, "in", "png")
 # Time spent for each strategy with only 5 actions and score =1 and item 4 for comp cog model comparison
 ###############################################################
 
-#seq_5act_only5_score1_item4<-subset(seq_5act_fredtime_strategy, item ==4 | item ==3 | item == 9)
-seq_5act_only5_score1_item4<-subset(seq_5act_fredtime_strategy, Condition == 1)
-seq_5act_only5_score1_item4<-subset(seq_5act_only5_score1_item4, ItemFinalScoreBinary ==1 & n_DD_event_new == 5)
+seq_5act_only5_score1_item4<-subset(seq_5act_fredtime_strategy, item ==4)
+seq_5act_only5_score1_item4<-subset(seq_5act_only5_score1_item4, Condition == 1 | Condition == 3)
+seq_5act_only5_score1_item4<-subset(seq_5act_only5_score1_item4, n_DD_event_new == 5)
 #seq_5act_only5_score1_item4<-subset(seq_5act_only5_score1_item4)
 
 #seq_5act_only5_score1_item4$new_coded_strategy<-with (seq_5act_only5_score1_item4, ifelse(Condition == 4 & strategy == "Source Focus", "Target Focus",
@@ -2269,7 +2269,7 @@ boxplot(seq_5act_only5_score1_item4$itemtime, horizontal = T)
 seq_5act_only5_score1_item4_wo_outliers <- seq_5act_only5_score1_item4[seq_5act_only5_score1_item4$itemtime > quantile(seq_5act_only5_score1_item4$itemtime, .25) - 1.5*IQR(seq_5act_only5_score1_item4$itemtime) & 
                                                                            seq_5act_only5_score1_item4$itemtime< quantile(seq_5act_only5_score1_item4$itemtime, .75) + 1.5*IQR(seq_5act_only5_score1_item4$itemtime), ] #rows
 
-boxplot(seq_5act_only5_score1_item4_wo_outliers$itemtime, horizontal = T)
+#boxplot(seq_5act_only5_score1_item4_wo_outliers$itemtime, horizontal = T)
 
 
 # raw time values
@@ -2284,9 +2284,9 @@ group.mean_new_only5_source_target<-group.mean_new_only5_source_target[,c(1,2,3,
 group.mean_new_only5_source_target$ModelvsExp<-c("Exp.","Exp.")
 
 ######################### update the model results based on target_v2
-model_results1<-data.frame("Source Focus","1000","37.33882","0.1418485")
+model_results1<-data.frame("Source Focus","1000","39.18978","0.1963607")
 names(model_results1)<-c("strategy","N","itemtime","se")
-model_results2<-data.frame("Target Focus","1000","47.11409","0.1996611")
+model_results2<-data.frame("Target Focus","1000","46.76323","0.1919813")
 names(model_results2)<-c("strategy","N","itemtime","se")
 model_results<-rbind(model_results1,model_results2)
 model_results$ModelvsExp<-c("Model","Model")
@@ -2304,7 +2304,7 @@ ggplot(data=combined_model_exp_results, aes(x=strategy, y=itemtime, fill=Modelvs
     geom_errorbar(aes(ymin=itemtime-se, ymax=itemtime+se), width=.2, position=position_dodge(.9)) +
     # geom_point(aes(color=new_strategy))+ 
     #facet_grid(~item)+
-    labs(title="Time Spent (5 actions only-Score 1 - Condition 1- item 4)", 
+    labs(title="Time Spent (5 actions only- Condition 1 & 3 - item 4)", 
          x="Strategy", y="Time spent (secs)", size=geom.text.size) +  
     theme_bw() + 
     theme(plot.title=element_text(size=theme.size, face="bold"), axis.title=element_text(size=theme.size, face="bold"), 
@@ -2312,7 +2312,7 @@ ggplot(data=combined_model_exp_results, aes(x=strategy, y=itemtime, fill=Modelvs
           legend.text=element_text(size=theme.size), legend.title=element_text(size=theme.size, face="bold")) + 
     scale_fill_discrete(name = "")
 
-fileName <- "time_byStrategies_only5actions_score1_cond1_item4source_target_model_comparison"
+fileName <- "time_byStrategies_only5actions_cond1_3_item4source_target_model_comparison"
 savefig(fileName, 300, 12, 8, "in", "png")
 
 
