@@ -238,6 +238,10 @@ str(merged_log)
 #merged_log$item_id [merged_log$item_id == ''] <- NA  # replace blanks by NAs
 #merged_log$item_id  <- na.locf(merged_log$item_id)
 
+
+## D&D actions>5
+nmore5<-subset(seq_5act, n_DD_event_new>5, select = "n_DD_event_new")
+summary(nmore5)
 ### subset only d&d items
 
 ##note than there is a mistake in DDSSMC_x columns' fill. item-loaded events for the first dd items filled as SSMC and the first post-test items are filled as DD
@@ -324,6 +328,9 @@ strategy_byID<- read.csv('DD_Exp1_Strategy_byIDn_CrossTab_03072019.csv')
 ct_byConditionStrategy_new<-crosstab(seq_5act_strategy, row.vars = c("Condition"), col.vars = "new_strategy", type = c("r"))
 write.csv(ct_byConditionStrategy_new$crosstab, 'DD_Exp1_Strategy_byCondition_CrossTab_01162019.csv', row.names=FALSE)
 strategy_byCondition<- read.csv('DD_Exp1_Strategy_byCondition_CrossTab_01162019.csv')
+
+
+
 
 
 
@@ -631,38 +638,6 @@ fileName <- ("Score_1_only_strategy_byCondition_stackbar")
 savefig(fileName, 300, 12, 8, "in", "png")
 
 
-# Omnibus test
-tbl_str_1 <- table(seq_5act_score_1$Condition, seq_5act_score_1$new_strategy)
-Xsq_str <- chisq.test(tbl_str_1) #X-squared = 1335.1, df = 8, p-value < 2.2e-16
-
-
-# Pairwise chi-square test
-
-s1df_pair_1_2 <- seq_5act_score_1[(seq_5act_score_1$Condition == 1) | (seq_5act_score_1$Condition == 2), ] 
-s1df_pair_1_2$Condition<-droplevels(s1df_pair_1_2$Condition)
-tbl_str_pair_1_21 <- table(s1df_pair_1_2$Condition, s1df_pair_1_2$new_strategy)
-Xsq_str_pair_1_21 <- chisq.test(tbl_str_pair_1_21)
-Xsq_str_pair_1_21
-
-s1df_pair_1_3<- seq_5act_score_1[(seq_5act_score_1$Condition == 1) | (seq_5act_score_1$Condition == 3), ] 
-s1df_pair_1_3$Condition<-droplevels(s1df_pair_1_3$Condition)
-df_pair_1_31 <- table(s1df_pair_1_3$Condition, s1df_pair_1_3$new_strategy)
-Xsq_str_pair_1_31 <- chisq.test(df_pair_1_31)
-Xsq_str_pair_1_31
-
-s1df_pair_1_4<- seq_5act_score_1[(seq_5act_score_1$Condition == 1) | (seq_5act_score_1$Condition == 4), ] 
-s1df_pair_1_4$Condition<-droplevels(s1df_pair_1_4$Condition)
-df_pair_1_41 <- table(s1df_pair_1_4$Condition, s1df_pair_1_4$new_strategy)
-Xsq_str_pair_1_41 <- chisq.test(df_pair_1_41)
-Xsq_str_pair_1_41
-
-s1df_pair_1_5<- seq_5act_score_1[(seq_5act_score_1$Condition == 1) | (seq_5act_score_1$Condition == 5), ]
-s1df_pair_1_5$Condition<-droplevels(s1df_pair_1_5$Condition)
-df_pair_1_51 <- table(s1df_pair_1_5$Condition, s1df_pair_1_5$new_strategy)
-Xsq_str_pair_1_51 <- chisq.test(df_pair_1_51)
-Xsq_str_pair_1_51
-
-
 ### percentage of strategies in each item except condition 4 since the strategies are reversed (!bu analize devam et!)
 
 seq_5act_exptcond4_scr1<-subset(seq_5act_strategy, Condition != 4 & ItemFinalScoreBinary ==1)
@@ -676,6 +651,15 @@ crosstab(seq_5act_exptcond4_scr1, row.vars = c("item"), col.vars = "new_strategy
 # Pre-test score differences between conditions
 ###################################################
 pre_test_scores <- subset(seq_5act, select=c("ID","Condition","pretest_final_score_total"))
+
+
+### lmer
+
+lmer_pretest<-
+
+
+
+### classic stat for average scores
 pre_test_scores <- unique(pre_test_scores)
 group.means_pretest <- summarySE(pre_test_scores, measurevar = "pretest_final_score_total", groupvars = c("Condition"), na.rm = TRUE)
 
@@ -684,7 +668,7 @@ hist(pre_test_scores$pretest_final_score_total)
 shapiro.test(pre_test_scores$pretest_final_score_total)
 
 kruskal.test(pretest_final_score_total ~ Condition, data = pre_test_scores) #n.s
-
+aggregate(pretest_final_score_total~Condition, pre_test_scores, median)
 #Kruskal-Wallis rank sum test
 
 #data:  pretest_final_score_total by Condition
@@ -696,6 +680,7 @@ kruskal.test(pretest_final_score_total ~ Condition, data = pre_test_scores) #n.s
 age <- read.csv("Exp1_demographics.csv") 
 age<-  subset(age, select=c("ProcessDataID","Condition","Age"))
 aggregate(Age~Condition, age, mean)
+aggregate(Age~Condition, age, median)
 aggregate(Age~Condition, age, sd)
 
 hist(age$Age)
@@ -1264,6 +1249,7 @@ boxplot(merged_log_dd_diff_nn_DD_event_new_5actions_dragging$secs, horizontal = 
 ## exclude the rows with 0s since they are due to server related actions
 merged_log_dd_diff_nn_DD_event_new_5actions_dragging<-subset(merged_log_dd_diff_nn_DD_event_new_5actions_dragging, Diff != 0)
 
+write.csv(merged_log_dd_diff_nn_DD_event_new_5actions_dragging, "dragging_time_for_Blair.csv")
 
 hist(merged_log_dd_diff_nn_DD_event_new_5actions_dragging$logsecs, breaks = 50)
 
@@ -1837,7 +1823,7 @@ AIC(lmer4)-AIC(lmer4a)  ## 253 >2 lmer4a is better #final
 #Condition4                              -0.42748    0.22131  -1.932  0.05341 .  
 #Condition5                               0.16305    0.22390   0.728  0.46647   
 
-### cinvert logits to probability
+### cinvert logits to probability or use plogis() instead
 logit2prob <- function(logit){
     odds <- exp(logit)
     prob <- odds / (1 + odds)
@@ -2892,6 +2878,81 @@ ct_byItemConditionParticipant_new_cond1_sum$Prc <- ct_byItemConditionParticipant
 #Order data
 ct_byItemConditionParticipant_new_cond1_sum <- ct_byItemConditionParticipant_new_cond1_sum[order(ct_byItemConditionParticipant_new_cond1_sum$ID, ct_byItemConditionParticipant_new_cond1_sum$new_strategy), ]
 write.csv(ct_byItemConditionParticipant_new_cond1_sum, 'DD_Exp1_Strategy_byItemConditionbyID_Cond1Sum_01232019.csv', row.names=FALSE)
+
+
+########################################################
+# Descriptive stats Table 1 ##note that the data condition numbers and the paper are different. 
+## Data      -> Paper
+#Condition 1 ->Condition 1
+#Condition 2 ->Condition 5
+#Condition 3 ->Condition 2
+#Condition 4 ->Condition 3
+#Condition 5 -> Condition 4
+
+########################################################
+
+##D&D score by condition
+sum_score_cond1<-subset(seq_5act, Condition == 1)
+sum(sum_score_cond1$ItemFinalScoreBinary) #730
+#730/97 = 7.45
+sd(sum_score_cond1$ItemFinalScoreBinary) # 0.43
+
+sum_score_cond2<-subset(seq_5act, Condition == 2)
+sum(sum_score_cond2$ItemFinalScoreBinary) #666
+#666/97 = 6.87
+sd(sum_score_cond2$ItemFinalScoreBinary) # 0.47
+
+sum_score_cond3<-subset(seq_5act, Condition == 3)
+sum(sum_score_cond3$ItemFinalScoreBinary) #648
+#648/94 = 6.89
+sd(sum_score_cond3$ItemFinalScoreBinary) # 0.46
+
+sum_score_cond4<-subset(seq_5act, Condition == 4)
+sum(sum_score_cond4$ItemFinalScoreBinary) #642
+#642/91 = 6.98
+sd(sum_score_cond4$ItemFinalScoreBinary) # 0.46
+
+sum_score_cond5<-subset(seq_5act, Condition == 5)
+sum(sum_score_cond5$ItemFinalScoreBinary) #692
+#692/93 = 7.44
+sd(sum_score_cond5$ItemFinalScoreBinary) # 0.46
+
+##D&D number of actions by condition
+dt_seq_5act<-data.table(seq_5act)
+dt_seq_5act[,list(mean=mean(n_DD_event_new),sd=sd(n_DD_event_new)),by=Condition]
+
+##D&D time by condition
+
+sum_dd_time_cond1<-subset(seq_5act_fredtime_, Condition == 1)
+hist(sum_dd_time_cond1$itemtime)
+sum(sum_dd_time_cond1$itemtime) #47923.86
+#47923.86/97 = 494.0604
+sd(sum_dd_time_cond1$itemtime) # 83.04408
+
+sum_dd_time_cond2<-subset(seq_5act_fredtime_, Condition == 2)
+sum(sum_dd_time_cond2$itemtime) #49232.28
+#49232.28/97 = 507.5493
+sd(sum_dd_time_cond2$itemtime) # 83.04408
+
+sum_dd_time_cond3<-subset(seq_5act_fredtime_, Condition == 3)
+sum(sum_dd_time_cond3$itemtime) #49549.31
+#49549.31/94 = 527.1203
+sd(sum_dd_time_cond3$itemtime) # 68.12444
+
+sum_dd_time_cond4<-subset(seq_5act_fredtime_, Condition == 4)
+sum(sum_dd_time_cond4$itemtime) #54436.88
+#54436.88/91 = 598.2075
+sd(sum_dd_time_cond4$itemtime) # 85.11034
+
+sum_dd_time_cond5<-subset(seq_5act_fredtime_, Condition == 5)
+sum(sum_dd_time_cond5$itemtime) #45447.05
+#45447.05/92 = 493.9897
+sd(sum_dd_time_cond5$itemtime) # 85.11034
+
+
+
+
+
 
 
 

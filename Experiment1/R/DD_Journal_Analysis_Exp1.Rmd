@@ -1,5 +1,6 @@
 ---
 title: 'Experiment 1: Drag-and-drop Analysis for Journal Paper'
+author: 'Burcu Arslan'
 output:
   html_document:
     df_print: paged
@@ -10,10 +11,10 @@ In this experiment, there are 10 math items. Each item has 5 sources and 3 targe
 
 * There are 5 experimental conditions: 
 1. Sources First, 
-2. Targets First, 
-3. No Problem Statement, 
-4. Swapped Content, 
-5. Multiple Comparison Numbers.
+2. Targets First (in the original data Condition 3), 
+3. Swapped Content (in the original data Condition 4), 
+4. No Problem Statement (in the original data Condition 5), 
+5. Multiple Comparison Numbers (in the original data Condition 2).
 
 ##Files
 
